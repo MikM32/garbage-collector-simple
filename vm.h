@@ -42,6 +42,10 @@ Obj* newObj(Vm* vm, size_t size, ObjType type)
 
     vm->numObj++;
 
+    //agrega el objeto a la lista de objetos
+    obj->next = vm->heap;
+    vm->heap = obj;
+
     return obj;
 }
 
@@ -72,13 +76,12 @@ ObjString* newObjString(Vm* vm, const char* str, int length)
     val_str.as.obj = (Obj*)obj_str;
     null_val.type = VAL_NULO;
 
-    //agrega el objeto a la lista de objetos
-    obj_str->obj.next = vm->heap;
-    vm->heap = (Obj*)obj_str;
 
+    //ingresa el objeto a la pila
     push(vm, val_str);
     ht_set(&vm->string_table, obj_str, null_val);
     pop(vm);
+    //saca el objeto de la pila para desmarcarlo
 
     return obj_str;
 }
@@ -89,8 +92,6 @@ ObjArray* newObjArray(Vm* vm, int length)
 
     obj_array->values = realloc(NULL, length*sizeof(Value));
     obj_array->length = length;
-    obj_array->obj.next = vm->heap;
-    vm->heap = (Obj*)obj_array;
 
     return obj_array;
 }
